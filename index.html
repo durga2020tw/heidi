@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三年級國語閱讀測驗</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: '標楷體', 'DFKai-SB', 'Noto Sans TC', sans-serif;
+    background: #f3f4f6;
+    color: #1a1a1a;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .quiz-wrap {
+    max-width: 700px;
+    margin: 32px auto;
+    padding: 0 16px 48px;
+  }
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .quiz-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #3a7d44;
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+  }
+  .quiz-header p {
+    font-size: 14px;
+    color: #666;
+  }
+  .passage-card {
+    background: #f0f7f1;
+    border-left: 5px solid #3a7d44;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 15px;
+    line-height: 2;
+    color: #2a2a2a;
+  }
+  .passage-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3a7d44;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .section-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background: #3a7d44;
+    display: inline-block;
+    padding: 5px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+  .q-card {
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+  .q-card.answered { border-color: #aacfae; }
+  .q-text {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  .q-num { color: #3a7d44; margin-right: 6px; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f8f8;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14.5px;
+    color: #222;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .opt-btn:hover:not(:disabled) { background: #eef6ef; border-color: #aacfae; }
+  .opt-btn.selected { background: #dceefb; border-color: #378ADD; color: #0a3a6e; }
+  .opt-btn.correct { background: #e4f4e2; border-color: #3a7d44; color: #1a4a1e; }
+  .opt-btn.wrong { background: #fde8e8; border-color: #e24b4a; color: #5a1010; }
+  .opt-label {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1.5px solid #ccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+    color: #555;
+  }
+  .opt-btn.selected .opt-label { background: #378ADD; color: #fff; border-color: #378ADD; }
+  .opt-btn.correct .opt-label { background: #3a7d44; color: #fff; border-color: #3a7d44; }
+  .opt-btn.wrong .opt-label { background: #e24b4a; color: #fff; border-color: #e24b4a; }
+  .submit-row {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .submit-btn {
+    padding: 11px 36px;
+    font-size: 16px;
+    font-weight: 700;
+    background: #3a7d44;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 1px;
+    transition: background 0.15s;
+  }
+  .submit-btn:hover:not(:disabled) { background: #2d6235; }
+  .submit-btn:disabled { background: #b0c8b3; cursor: default; }
+  .progress-txt { font-size: 14px; color: #888; }
+  .result-banner {
+    display: none;
+    margin-top: 24px;
+    background: #fff;
+    border: 2px solid #3a7d44;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+  .result-score {
+    font-size: 42px;
+    font-weight: 700;
+    color: #3a7d44;
+    margin-bottom: 8px;
+  }
+  .result-msg { font-size: 16px; color: #555; margin-bottom: 16px; }
+  .retry-btn {
+    padding: 10px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    background: #fff;
+    color: #3a7d44;
+    border: 2px solid #3a7d44;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .retry-btn:hover { background: #f0f7f1; }
+</style>
+</head>
+<body>
+<div class="quiz-wrap">
+  <div class="quiz-header">
+    <h1>🌿 三年級國語閱讀測驗 🐾</h1>
+    <p>主題：自然與動物 &nbsp;|&nbsp; 共10題，每題10分，滿分100分</p>
+  </div>
+
+  <div class="passage-card">
+    <div class="passage-label">📖 閱讀文章：小蜜蜂的一天</div>
+    　　春天到了，花園裡的花兒一朵一朵地開放。小蜜蜂小黃從蜂巢裡飛出來，開始了牠忙碌的一天。<br><br>
+    　　小黃先飛到一朵紅色的玫瑰花旁，用細長的口器吸取花蜜。牠把花蜜裝進肚子裡，同時腳上也沾滿了黃色的花粉。小黃從這朵花飛到那朵花，把花粉帶到每一朵花上，幫助花朵結出果實，這個工作叫做「傳粉」。<br><br>
+    　　傍晚，小黃帶著滿滿的花蜜回到蜂巢。工蜂們把花蜜一起釀造成甜甜的蜂蜜。一隻蜜蜂一生只能生產大約一茶匙的蜂蜜，所以每一滴蜂蜜都非常珍貴。<br><br>
+    　　蜜蜂不只是幫我們做蜂蜜，更重要的是，牠們幫助植物傳粉，讓水果和蔬菜能夠順利生長。如果沒有蜜蜂，地球上很多植物都無法結出果實。蜜蜂真是大自然中不可缺少的小幫手！
+  </div>
+
+  <div class="section-label">選擇題（每題10分，共100分）</div>
+
+  <div id="questions"></div>
+
+  <div class="submit-row">
+    <button class="submit-btn" id="submitBtn" onclick="submitQuiz()" disabled>交卷</button>
+    <span class="progress-txt" id="progressTxt">已作答 0 / 10 題</span>
+  </div>
+
+  <div class="result-banner" id="resultBanner">
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg" id="resultMsg"></div>
+    <button class="retry-btn" onclick="retryQuiz()">🔄 重新作答</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { q: "文章中，小黃是什麼動物？", opts: ["蝴蝶","蜜蜂","螞蟻","蜻蜓"], ans: 1 },
+  { q: "小黃是在什麼季節開始工作的？", opts: ["夏天","秋天","冬天","春天"], ans: 3 },
+  { q: "小黃用什麼器官吸取花蜜？", opts: ["翅膀","觸角","細長的口器","腳"], ans: 2 },
+  { q: "小黃的腳上沾滿了什麼？", opts: ["泥土","蜂蜜","花瓣","黃色的花粉"], ans: 3 },
+  { q: "「傳粉」是指什麼？", opts: ["把蜂蜜傳給其他動物","把花粉帶到其他花朵上","把花朵摘下來送人","把花蜜存放在蜂巢裡"], ans: 1 },
+  { q: "傍晚，小黃帶著什麼回到蜂巢？", opts: ["花瓣","葉子","滿滿的花蜜","其他蜜蜂"], ans: 2 },
+  { q: "花蜜是由誰負責釀造成蜂蜜的？", opts: ["蜂后","小黃一隻蜜蜂","工蜂們一起","農夫"], ans: 2 },
+  { q: "一隻蜜蜂一生大約能生產多少蜂蜜？", opts: ["一杯","一茶匙","一碗","一桶"], ans: 1 },
+  { q: "蜜蜂對大自然最重要的貢獻是什麼？", opts: ["讓花園變得美麗","把壞蟲趕走","幫助植物傳粉，讓果實順利生長","幫泥土施肥"], ans: 2 },
+  { q: "如果地球上沒有蜜蜂，會發生什麼事？", opts: ["花朵會開得更漂亮","很多植物無法結出果實","蜂蜜會變得更多","春天不會來臨"], ans: 1 },
+];
+
+const labels = ["A","B","C","D"];
+const selected = new Array(10).fill(-1);
+let submitted = false;
+
+function getMsg(correct) {
+  if (correct <= 4) return "繼續加油，多複習一下文章！";
+  if (correct <= 6) return "不錯喔，再努力一點！";
+  if (correct <= 7) return "很好！再接再厲！";
+  if (correct <= 9) return "優秀！答對大部分題目！";
+  return "太厲害了！全部答對！";
+}
+
+function render() {
+  const container = document.getElementById("questions");
+  container.innerHTML = "";
+  questions.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "q-card" + (selected[qi] !== -1 ? " answered" : "");
+    let html = `<div class="q-text"><span class="q-num">${qi + 1}.</span>${q.q}</div><div class="options">`;
+    q.opts.forEach((opt, oi) => {
+      let cls = "opt-btn";
+      if (submitted) {
+        if (oi === q.ans) cls += " correct";
+        else if (oi === selected[qi]) cls += " wrong";
+      } else if (oi === selected[qi]) cls += " selected";
+      const disabled = submitted ? "disabled" : "";
+      html += `<button class="${cls}" ${disabled} onclick="choose(${qi},${oi})">
+        <span class="opt-label">${labels[oi]}</span>${opt}</button>`;
+    });
+    html += "</div>";
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+  updateProgress();
+}
+
+function choose(qi, oi) {
+  if (submitted) return;
+  selected[qi] = oi;
+  render();
+}
+
+function updateProgress() {
+  const done = selected.filter(s => s !== -1).length;
+  document.getElementById("progressTxt").textContent = `已作答 ${done} / 10 題`;
+  document.getElementById("submitBtn").disabled = done < 10;
+}
+
+function submitQuiz() {
+  if (selected.filter(s => s !== -1).length < 10) return;
+  submitted = true;
+  render();
+  let correct = 0;
+  questions.forEach((q, i) => { if (selected[i] === q.ans) correct++; });
+  const score = correct * 10;
+  document.getElementById("resultScore").textContent = score + " 分（答對 " + correct + " / 10 題）";
+  document.getElementById("resultMsg").textContent = getMsg(correct);
+  document.getElementById("resultBanner").style.display = "block";
+  document.getElementById("submitBtn").disabled = true;
+  document.getElementById("resultBanner").scrollIntoView({ behavior: "smooth" });
+}
+
+function retryQuiz() {
+  submitted = false;
+  selected.fill(-1);
+  document.getElementById("resultBanner").style.display = "none";
+  document.getElementById("submitBtn").disabled = true;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+render();
+</script>
+</body>
+</html>
